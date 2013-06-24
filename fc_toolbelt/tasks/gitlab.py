@@ -33,7 +33,7 @@ class BaseGitlabTask(Task):
     def connect(self):
         self.GITLAB_URL = env.get('GITLAB_URL', '').strip('/')
         if not self.GITLAB_URL:
-            abort(red('Provide env variable GITLAB_URL pointing to your Gitlab instance'))
+            abort(red('Provide fabric env variable GITLAB_URL pointing to your Gitlab instance'))
 
         self.GITLAB_HOST = urlparse.urlparse(self.GITLAB_URL).netloc
 

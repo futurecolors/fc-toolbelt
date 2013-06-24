@@ -19,7 +19,7 @@ class BaseJenkinsTask(Task):
     def run(self):
         self.JENKINS_URL = env.get('JENKINS_URL', '').strip('/')
         if not self.JENKINS_URL:
-            abort(red('Provide env variable JENKINS_URL pointing to your jenkins instance'))
+            abort(red('Provide fabric env variable JENKINS_URL pointing to your jenkins instance.'))
 
         JENKINS_LOGIN = env.get('JENKINS_LOGIN', '')
         JENKINS_PASSWORD = env.get('JENKINS_PASSWORD', '')

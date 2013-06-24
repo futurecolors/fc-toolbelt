@@ -8,15 +8,23 @@ A set of useful scripts to setup local development environment.
 
 Installation
 ------------
+::
 
     pip install -e git+https://github.com/futurecolors/fc-toolbelt#egg=fc_toolbelt
+    fct config
 
 Usage
 -----
+::
 
     fct COMMAND [command-specific-options]
     fct help COMMAND
 
+
+Commands
+^^^^^^^^
+
+:config:     Configure toolbelt for first usage
 :update:     Updates code, packages and reloads server
 :gitlab:     Shortcuts to create projects & assign users
 :jenkins:    Create new jenkins jobs
