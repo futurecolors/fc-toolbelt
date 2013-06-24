@@ -17,6 +17,7 @@ Usage
     fct COMMAND [command-specific-options]
     fct help COMMAND
 
-:fct update:     Updates code, packages and reloads server
-:fct help:       Usage instructions
+:update:     Updates code, packages and reloads server
+:gitlab:     Shortcuts to create projects & assign users
+:help:       Usage instructions
 

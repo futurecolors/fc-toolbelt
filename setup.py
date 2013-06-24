@@ -10,7 +10,8 @@ setup(
     install_requires=[
         'fabric>=1.5',
         'fabric-taskset==0.2.1',
-        'docopt>=0.6.1'
+        'docopt>=0.6.1',
+        'hammock==0.2.4'
     ],
     entry_points={
         'console_scripts': [

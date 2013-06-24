@@ -1,4 +1,5 @@
 # coding: utf-8
+from fabric.context_managers import settings, hide
 from fabric.tasks import Task
 from fabric.api import local
 from fabric.utils import puts
@@ -13,7 +14,9 @@ class BaseUpdateLocalEnvTask(Task):
 
     def update_code(self):
         puts('Updating code...')
-        local('git pull')
+        # In case it's not a git repo, skip
+        with settings(hide('warnings'), warn_only=True):
+            local('git pull')
 
     def virtualenv_update(self):
         """Update packages first"""
@@ -29,17 +32,6 @@ class BaseUpdateLocalEnvTask(Task):
 
 
 class DjangoUpdateLocalEnv(BaseUpdateLocalEnvTask):
-    """
-       Update code, install packages, sync/migrate and reload.
-
-       USAGE: fct update
-
-       * update current git repo (pull)
-       * install latest packages fro requirements.txt
-       * update database (syncdb & migrate)
-       * reload uwsgi instance
-
-    """
 
     def smart_syncdb_migrate(self):
         """Workaround manage.py migrate complications
