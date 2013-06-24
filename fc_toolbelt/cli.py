@@ -10,6 +10,7 @@ usage:
 available commands:
     help       Prints instruction how to use specific command
     gitlab     Shortcuts to create projects & assign users
+    jenkins    Create new jenkins jobs
     update     Updates code, packages and reloads server
 
 options:
@@ -27,6 +28,7 @@ from fabric.tasks import execute
 import fc_toolbelt
 from fc_toolbelt.tasks import django
 from fc_toolbelt.tasks.gitlab import create_repo, assign
+from fc_toolbelt.tasks.jenkins import create_job
 
 
 def main():
@@ -34,11 +36,11 @@ def main():
     options = docopt(__doc__, argv=sys.argv[1:] if len(sys.argv) > 1 else ['--help'],
                      version=fc_toolbelt.__VERSION__)
 
-    available_commands = ['gitlab', 'update']
+    available_commands = ['gitlab', 'jenkins', 'update']
     command = options['<command>']
 
     if options['<command>'] in available_commands:
-        globals()[command](sys.argv[1:])
+        globals()[command](sys.argv)
     elif options['<command>'] == 'help':
         if not options['<args>']:
             exit(__doc__)
@@ -82,3 +84,21 @@ def gitlab(argv):
         execute(create_repo, project_slug=options['<project_slug>'])
     elif options['assign']:
         execute(assign, project_slug=options['<project_slug>'], user_email=options['<user_email>'])
+
+
+def jenkins(argv):
+    """
+       Shortcuts to create jobs in jenkins.
+
+       Template job is copied and templated ({{project}} is replaced with project slug).
+       It's enabled after that and executed.
+
+       Usage:
+          fct jenkins create_job <project_slug> <job_name> [<template_job>]
+    """
+    options = docopt(jenkins.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
+    if options['create_job']:
+        execute(create_job,
+                job_name=options['<job_name>'],
+                project_slug=options['<project_slug>'],
+                template_job=options['<template_job>'])

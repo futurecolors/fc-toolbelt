@@ -19,5 +19,6 @@ Usage
 
 :update:     Updates code, packages and reloads server
 :gitlab:     Shortcuts to create projects & assign users
+:jenkins:    Create new jenkins jobs
 :help:       Usage instructions
 

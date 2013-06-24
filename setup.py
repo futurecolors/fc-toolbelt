@@ -11,7 +11,8 @@ setup(
         'fabric>=1.5',
         'fabric-taskset==0.2.1',
         'docopt>=0.6.1',
-        'hammock==0.2.4'
+        'hammock==0.2.4',
+        'jenkinsapi==0.2.6',
     ],
     entry_points={
         'console_scripts': [
