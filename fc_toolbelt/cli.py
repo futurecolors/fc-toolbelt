@@ -24,6 +24,8 @@ import sys
 import textwrap
 
 from docopt import docopt
+from fabric import state
+from fabric.main import load_settings
 from fabric.tasks import execute
 
 import fc_toolbelt
@@ -39,6 +41,9 @@ def main():
 
     available_commands = ['gitlab', 'jenkins', 'config', 'update']
     command = options['<command>']
+
+    # Load fabric defaults from ~/.fabricrc
+    state.env.update(load_settings(state._rc_path()))
 
     if options['<command>'] in available_commands:
         globals()[command](sys.argv)
