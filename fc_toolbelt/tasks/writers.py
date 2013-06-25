@@ -26,6 +26,9 @@ class BaseWriterTask(Task):
     def get_project_path(self, project, developer):
         return os.path.join(env.PROJECTS_PATH_TEMPLATE % ({'user': developer}), project)
 
+    def get_env_path(self, project, developer):
+        return os.path.join(env.ENVS_PATH_TEMPLATE % ({'user': developer}), project)
+
 
 class WriteProjectFolders(BaseWriterTask):
     """ Local deploy to dev server per developer
@@ -78,7 +81,7 @@ class WriteUwsgiConfig(BaseWriterTask):
     def get_context(self, project_slug, developer):
         server_name = self.get_server_name(project_slug, developer)
         project_dir = self.get_project_path(project_slug, developer)
-        env_dir = os.path.join(project_dir, 'env')
+        env_dir = self.get_env_path(project_slug, developer)
         return {
             'GROUP': env.DEVELOPERS_USERGROUP,
             'RELOAD_TXT': os.path.join(env_dir, 'reload.txt'),
