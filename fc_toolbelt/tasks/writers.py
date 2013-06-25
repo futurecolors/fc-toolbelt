@@ -10,8 +10,6 @@ from fabric.state import env
 from fabric.tasks import Task
 from fabric.utils import puts
 
-from .utils import inside_projects
-
 
 class BaseWriterTask(Task):
     def get_template_path(self):
@@ -47,29 +45,30 @@ class WriteProjectFolders(BaseWriterTask):
         )
         sudo('chmod -R 755 {project}'.format(user=developer, project=project_slug))
 
-    def copy_repo_files_install_env(self, project_slug, repo_url):
+    def copy_repo_files_install_env(self, project_slug, project_path, repo_url):
         """ workaround not having permissions in target dir to clone directly"""
         tmp_dir = '/tmp/fctools/%s' % project_slug
-        run('rm -rf %s' % tmp_dir)
+        sudo('rm -rf %s' % tmp_dir)
         run('git clone %s %s -b dev' % (repo_url, tmp_dir))  # dev branch is default
-        run('rm -rf %s/.git' % tmp_dir)
-        self.user_sudo('cp -R %s/* .' % tmp_dir)
-        run('rm -rf %s' % tmp_dir)
+        sudo('rm -rf %s/.git' % tmp_dir)
+        sudo('cp -R %s/* %s' % (tmp_dir, project_path))
+        sudo('rm -rf %s' % tmp_dir)
 
-    @inside_projects
     def run(self, project_slug, developer, repo_url=None):
         self.user_sudo = user_sudo = partial(sudo, user=developer)
-        user_sudo('mkdir -p %s' % project_slug)
+        project_path = self.get_project_path(project_slug, developer)
+        with cd(project_path):
+            user_sudo('mkdir -p %s' % project_slug)
         if repo_url:
-            with cd(project_slug):
-                self.copy_repo_files_install_env(project_slug, repo_url)
+            self.copy_repo_files_install_env(project_slug, project_path, repo_url)
         mkenv_command = 'mkvirtualenv --python=python2.7 -a %(project_path)s -r %(reqs)s %(env_name)s'
         user_sudo(mkenv_command % {'project_path': self.get_project_path(project_slug, developer),
                                    'reqs': 'requirements.txt',
                                    'env_name': project_slug})
         with cd(env.ENVS_PATH_TEMPLATE % {'user': developer}):
             user_sudo('touch %s/reload.txt' % project_slug)
-        self.run_chmod(project_slug, developer)
+        with cd(project_path):
+            self.run_chmod(project_slug, developer)
 
 write_project = WriteProjectFolders()
 
