@@ -11,12 +11,13 @@ usage:
 
 available commands:
     config     Configure toolbelt for first usage
-    update     Updates code, packages and reloads server
-    tickets    Tickets, mentioned in commits between two branches/tags
-    redmine    Create project, assign developers
-    help       Prints instruction how to use specific command
     gitlab     Shortcuts to create projects & assign users
+    help       Prints instruction how to use specific command
     jenkins    Create new jenkins jobs
+    redmine    Create project, assign developers
+    tickets    Tickets, mentioned in commits between two branches/tags
+    unbox      Local deploys
+    update     Updates code, packages and reloads server
 
 options:
   -h --help     Show this screen
@@ -36,7 +37,6 @@ import textwrap
 from docopt import docopt
 from fabric import state
 from fabric.main import load_settings
-from fabric.state import env
 from fabric.tasks import execute
 
 import fc_toolbelt
@@ -45,6 +45,7 @@ from fc_toolbelt.tasks.gitlab import create_repo, assign
 from fc_toolbelt.tasks.jenkins import create_job
 from fc_toolbelt.tasks.redmine import create_project, assign_permissions
 from fc_toolbelt.tasks.tickets import diff_tickets
+from fc_toolbelt.tasks.writers import write_project
 
 
 logger = logging.getLogger('fc_toolbelt')
@@ -55,7 +56,7 @@ def main():
     options = docopt(__doc__, argv=sys.argv[1:] if len(sys.argv) > 1 else ['--help'],
                      version=fc_toolbelt.__VERSION__)
 
-    available_commands = ['config', 'gitlab', 'jenkins', 'redmine', 'tickets', 'update']
+    available_commands = ['config', 'gitlab', 'jenkins', 'redmine', 'tickets', 'unbox', 'update']
     command = options['<command>']
 
     # Load fabric defaults from ~/.fabricrc
@@ -220,3 +221,17 @@ def tickets(argv):
             kwargs[mapping[arg]] = options.get(arg)
 
     execute(diff_tickets, **kwargs)
+
+
+def unbox(argv):
+    """
+       Local deploys
+
+       Usage:
+          fct unbox write_project <project_slug> <developer>
+    """
+    options = docopt(unbox.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
+
+    if options['write_project']:
+        execute(write_project, project_slug=options['<project_slug>'],
+                               developer=options['<developer>'],)

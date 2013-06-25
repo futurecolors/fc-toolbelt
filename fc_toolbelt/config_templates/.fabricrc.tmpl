@@ -1,3 +1,4 @@
+hosts = # comma-delimited list of host strings for remote tasks
 REDMINE_URL =
 REDMINE_API_KEY =
 REDMINE_DEVELOPER_ROLE_ID = 4  # Default role to assign users in project
@@ -8,6 +9,8 @@ JENKINS_URL =
 JENKINS_LOGIN = {user}
 JENKINS_PASSWORD =
 JENKINS_TEMPLATE_JOB = example-tests
-TEMPLATE_PROJECT_REPO = https://github.com/futurecolors/tinned-django # Git repo of project template
-TEMPLATE_PROJECT_PACKAGE = tinned_django # Package to use inside TEMPLATE_PROJECT_REPO
-PROJECTS_PATH_TEMPLATE = /home/%(user)s/projects/ # Where to store developers' projects
+TEMPLATE_PROJECT_REPO = https://github.com/futurecolors/tinned-django  # Git repo of project template
+TEMPLATE_PROJECT_PACKAGE = tinned_django  # Package to use inside TEMPLATE_PROJECT_REPO
+PROJECTS_PATH_TEMPLATE = /home/%(user)s/src/  # Where to store developers' projects
+ENVS_PATH_TEMPLATE = /home/%(user)s/envs/  # Virtualenvs live here
+DEVELOPERS_USERGROUP = fcolors # Unix group

@@ -25,10 +25,11 @@ Commands
 ^^^^^^^^
 
 :config:     Configure toolbelt for first usage
-:update:     Updates code, packages and reloads server
-:tickets:    Tickets, mentioned in commits between two branches/tags
-:redmine:    Create project, assign developers
 :gitlab:     Shortcuts to create repos & assign users
-:jenkins:    Create new jenkins jobs
 :help:       Usage instructions
+:jenkins:    Create new jenkins jobs
+:redmine:    Create project, assign developers
+:tickets:    Tickets, mentioned in commits between two branches/tags
+:unbox:      Local deploys
+:update:     Updates code, packages and reloads server
 
