@@ -1,0 +1,39 @@
+server {
+    server_name {{ SERVER_NAME }} {{ SERVER_NAME }}.fcdev.ru
+                *.{{ SERVER_NAME }} *.{{ SERVER_NAME }}.fcdev.ru;
+
+    listen {{ SERVER_IP }};
+
+    access_log /var/log/nginx/{{ SERVER_NAME }}.access_log main;
+    error_log /var/log/nginx/{{ SERVER_NAME }}.error_log info;
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix://{{ SOCKET_PATH }};
+        uwsgi_read_timeout 600;
+    }
+
+    location /auth {
+        include uwsgi_params;
+        uwsgi_pass unix://{{ SOCKET_PATH }};
+        allow all;
+    }
+
+    location /media {
+        root {{ PROJECT_PATH }};
+        autoindex off;
+    }
+
+    location /robots.txt {
+        root {{ PROJECT_PATH }}/static/;
+        expires -1;
+    }
+    location /humans.txt {
+        root {{ PROJECT_PATH }}/static/;
+        expires -1;
+    }
+    location /favicon.ico {
+        root {{ PROJECT_PATH }}/static/;
+        expires 1M;
+    }
+}

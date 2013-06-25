@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 from functools import partial
+import socket
 from fabric.context_managers import cd
 from fabric.contrib.files import upload_template
 
@@ -12,14 +13,17 @@ from .utils import inside_projects
 
 
 class BaseWriterTask(Task):
-    def get_template_path(self, filename=''):
-        return os.path.join('fc_toolbelt/config_templates/', filename)
+    def get_template_path(self):
+        return 'fc_toolbelt/config_templates/'
 
     def get_server_name(self, project, developer):
         return '%s.%s' % (project, developer)
 
     def get_socket_path(self, server_name):
-        return '/tmp/%s.sock' % server_name
+        return '/var/run/uwsgi/%s.sock' % server_name
+
+    def get_project_path(self, project, developer):
+        return os.path.join(env.PROJECTS_PATH_TEMPLATE % ({'user': developer}), project)
 
 
 class WriteProjectFolders(Task):
@@ -70,13 +74,13 @@ class WriteUwsgiConfig(BaseWriterTask):
 
     def get_context(self, project_slug, developer):
         server_name = self.get_server_name(project_slug, developer)
-        project_dir = os.path.join(env.PROJECTS_PATH_TEMPLATE, project_slug)
+        project_dir = self.get_project_path(project_slug, developer)
         env_dir = os.path.join(project_dir, 'env')
         return {
             'GROUP': env.DEVELOPERS_USERGROUP,
             'RELOAD_TXT': os.path.join(env_dir, 'reload.txt'),
             'PATH_TO_VIRTUALENV': env_dir,
-            'PROJECT_PATH': os.path.join(project_dir),
+            'PROJECT_PATH': project_dir,
             'SERVER_NAME': server_name,
             'SOCKET_PATH': self.get_socket_path(server_name),
             'USER': developer,
@@ -103,3 +107,30 @@ class WriteUwsgiConfig(BaseWriterTask):
         })
 
 write_uwsgi = WriteUwsgiConfig()
+
+
+class WriteNginxConfig(BaseWriterTask):
+    """ Write nginx config for project+developer"""
+    name = 'write_nginx'
+
+    def get_context(self, project_slug, developer):
+        server_name = self.get_server_name(project_slug, developer)
+        return {
+            'SERVER_NAME': server_name,
+            'SERVER_IP': socket.gethostbyname(env.hosts),
+            'SOCKET_PATH': self.get_socket_path(server_name),
+            'PROJECT_PATH': self.get_project_path(project_slug, developer),
+        }
+
+    def run(self, project_slug, developer):
+        upload_template(
+            template_dir=self.get_template_path(),
+            filename='nginx.config.tmpl',
+            destination='/etc/nginx/fc/%s' % self.get_server_name(project_slug, developer),
+            context=self.get_context(project_slug, developer),
+            use_jinja=True,
+            use_sudo=True,
+            backup=False
+        )
+
+write_nginx = WriteNginxConfig()
