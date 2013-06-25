@@ -13,6 +13,8 @@ Installation
     pip install -e git+https://github.com/futurecolors/fc-toolbelt#egg=fc_toolbelt
     fct config
 
+Make sure you have sufficient permissions on remote server.
+
 Usage
 -----
 ::

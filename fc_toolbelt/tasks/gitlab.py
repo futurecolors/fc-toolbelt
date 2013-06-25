@@ -30,6 +30,10 @@ class BaseGitlabTask(Task):
     def get_users_emails(self):
         return [user['email'] for user in self.api.users.GET().json if not user['blocked']]
 
+    def get_repo_url_by_path(self, path):
+        return "git@%(host)s:%(path)s.git" % {'host': self.GITLAB_HOST,
+                                              'path': path}
+
     def connect(self):
         self.GITLAB_URL = env.get('GITLAB_URL', '').strip('/')
         if not self.GITLAB_URL:
@@ -61,8 +65,7 @@ class CreateRepo(BaseGitlabTask):
         if response.status_code != requests.codes.created:
             abort(red('Project not created %s' % response.content))
         puts("Created repository %s/%s" % (self.GITLAB_URL, response.json()['path_with_namespace']))
-        repo_url = "git@%(host)s:%(path)s.git" % {'host': self.GITLAB_HOST,
-                                                  'path': response.json()['path']}
+        repo_url = self.get_repo_url_by_path(response.json()['path'])
         return repo_url
 
 create_repo = CreateRepo()

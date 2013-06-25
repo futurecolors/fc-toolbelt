@@ -1,10 +1,16 @@
 # coding: utf-8
+from functools import partial
 import os
 
 from fabric.context_managers import cd, prefix
-from fabric.operations import run
+from fabric.operations import run, sudo
 from fabric.state import env
-from fabric.tasks import Task
+from fabric.tasks import Task, execute
+from fabric.utils import puts
+from fc_toolbelt.tasks.gitlab import BaseGitlabTask
+from fc_toolbelt.tasks.mysql import create_dev_db
+
+from .writers import write_uwsgi, write_nginx, write_project
 
 
 class OpenTin(Task):
@@ -48,3 +54,37 @@ class OpenTin(Task):
             run('git push --all --force')
 
 open_tin = OpenTin()
+
+
+class AddDeveloper(BaseGitlabTask):
+    """ Creates development project environment for developer"""
+    name = 'add_developer'
+
+    def run(self, project_slug, developer):
+        self.project_slug = project_slug
+        self.developer = developer
+        self.connect()
+        repo_url = self.get_repo_url_by_path(project_slug)
+        self.setup_files(repo_url)
+        self.setup_databases()
+        self.setup_http()
+
+    def setup_files(self, repo_url):
+        sudo_user = partial(sudo, user=self.developer)
+        sudo_user('mkdir -p %s' % env.PROJECTS_PATH_TEMPLATE % {'user': self.developer})
+        puts('Setting up new project "%s" for %s' % (self.project_slug, self.developer))
+        execute(write_project, project_slug=self.project_slug,
+                               developer=self.developer,
+                               repo_url=repo_url)
+        puts('Created project "%s" layout for %s' % (self.project_slug, self.developer))
+
+    def setup_databases(self):
+        execute(create_dev_db, self.project_slug, self.developer)
+        puts('Created dev db "%s" for %s' % (self.project_slug, self.developer))
+
+    def setup_http(self):
+        execute(write_uwsgi, self.project_slug, self.developer)
+        execute(write_nginx, self.project_slug, self.developer)
+        puts('Nginx+uwsgi are set up for "%s" project, developer %s' % (self.project_slug, self.developer))
+
+add_developer = AddDeveloper()

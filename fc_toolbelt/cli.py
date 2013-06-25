@@ -43,10 +43,9 @@ import fc_toolbelt
 from fc_toolbelt.tasks import django, setup
 from fc_toolbelt.tasks.gitlab import create_repo, assign
 from fc_toolbelt.tasks.jenkins import create_job
-from fc_toolbelt.tasks.project import open_tin
+from fc_toolbelt.tasks.project import open_tin, add_developer
 from fc_toolbelt.tasks.redmine import create_project, assign_permissions
 from fc_toolbelt.tasks.tickets import diff_tickets
-from fc_toolbelt.tasks.writers import write_project, write_uwsgi, write_nginx
 
 
 logger = logging.getLogger('fc_toolbelt')
@@ -229,19 +228,14 @@ def unbox(argv):
        Local deploys
 
        Usage:
-          fct unbox write_project <project_slug> <developer>
-          fct unbox write_uwsgi <project_slug> <developer>
-          fct unbox write_nginx <project_slug> <developer>
+          fct unbox add_developer <project_slug> <developer>
           fct unbox open_tin <project_slug> <repo_url>
     """
     options = docopt(unbox.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
 
-    if options['write_project']:
-        execute(write_project, project_slug=options['<project_slug>'],
-                               developer=options['<developer>'],)
-    if options['write_uwsgi']:
-        execute(write_uwsgi, project_slug=options['<project_slug>'],
-                               developer=options['<developer>'],)
     if options['open_tin']:
         execute(open_tin, project_slug=options['<project_slug>'],
                           repo_url=options['<repo_url>'],)
+    if options['add_developer']:
+        execute(add_developer, project_slug=options['<project_slug>'],
+                               developer=options['<developer>'],)

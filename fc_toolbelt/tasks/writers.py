@@ -8,6 +8,7 @@ from fabric.contrib.files import upload_template
 from fabric.operations import sudo, run
 from fabric.state import env
 from fabric.tasks import Task
+from fabric.utils import puts
 
 from .utils import inside_projects
 
@@ -26,7 +27,7 @@ class BaseWriterTask(Task):
         return os.path.join(env.PROJECTS_PATH_TEMPLATE % ({'user': developer}), project)
 
 
-class WriteProjectFolders(Task):
+class WriteProjectFolders(BaseWriterTask):
     """ Local deploy to dev server per developer
 
         * create project folder
@@ -46,21 +47,23 @@ class WriteProjectFolders(Task):
     def copy_repo_files_install_env(self, project_slug, repo_url):
         """ workaround not having permissions in target dir to clone directly"""
         tmp_dir = '/tmp/fctools/%s' % project_slug
-        run('rm -r %s' % tmp_dir)
+        run('rm -rf %s' % tmp_dir)
         run('git clone %s %s -b dev' % (repo_url, tmp_dir))  # dev branch is default
-        run('rm -r %s/.git' % tmp_dir)
-        self.user_sudo('cp -R %s/* src' % tmp_dir)
-        self.user_sudo('env/bin/pip install -r src/requirements.txt --download-cache=/tmp/fctools-cache/')
-        run('rm -r %s' % tmp_dir)
+        run('rm -rf %s/.git' % tmp_dir)
+        self.user_sudo('cp -R %s/* .' % tmp_dir)
+        run('rm -rf %s' % tmp_dir)
 
     @inside_projects
     def run(self, project_slug, developer, repo_url=None):
         self.user_sudo = user_sudo = partial(sudo, user=developer)
         user_sudo('mkdir -p %s' % project_slug)
-        user_sudo('mkvirtualenv --python=python2.7 %s' % project_slug)
         if repo_url:
             with cd(project_slug):
                 self.copy_repo_files_install_env(project_slug, repo_url)
+        mkenv_command = 'mkvirtualenv --python=python2.7 -a %(project_path)s -r %(reqs)s %(env_name)s'
+        user_sudo(mkenv_command % {'project_path': self.get_project_path(project_slug, developer),
+                                   'reqs': 'requirements.txt',
+                                   'env_name': project_slug})
         with cd(env.ENVS_PATH_TEMPLATE % {'user': developer}):
             user_sudo('touch %s/reload.txt' % project_slug)
         self.run_chmod(project_slug, developer)
@@ -101,7 +104,7 @@ class WriteUwsgiConfig(BaseWriterTask):
             use_jinja=True,
             backup=False
         )
-        sudo('ln -s %(available)s %(enabled)s' % {
+        sudo('ln -fs %(available)s %(enabled)s' % {
             'available': config_available_path,
             'enabled': config_enabled_path
         })
@@ -110,7 +113,7 @@ write_uwsgi = WriteUwsgiConfig()
 
 
 class WriteNginxConfig(BaseWriterTask):
-    """ Write nginx config for project+developer"""
+    """ Write nginx config for project+developer and reload nginx"""
     name = 'write_nginx'
 
     def get_context(self, project_slug, developer):
@@ -122,15 +125,21 @@ class WriteNginxConfig(BaseWriterTask):
             'PROJECT_PATH': self.get_project_path(project_slug, developer),
         }
 
-    def run(self, project_slug, developer):
+    def run(self, project_slug, developer, noreload=False):
+        context = self.get_context(project_slug, developer)
         upload_template(
             template_dir=self.get_template_path(),
             filename='nginx.config.tmpl',
             destination='/etc/nginx/fc/%s' % self.get_server_name(project_slug, developer),
-            context=self.get_context(project_slug, developer),
+            context=context,
             use_jinja=True,
             use_sudo=True,
             backup=False
         )
+        if not noreload:
+            sudo('/etc/init.d/nginx reload')
+        puts('Add this lines to your /etc/hosts:')
+        puts('%(ip)s   %(project_domain)s' % {'ip': context['SERVER_IP'], 'project_domain': context['SERVER_NAME']})
+        puts('%(ip)s   *.%(project_domain)s.fcdev.ru' % {'ip': context['SERVER_IP'], 'project_domain': context['SERVER_NAME']})
 
 write_nginx = WriteNginxConfig()
