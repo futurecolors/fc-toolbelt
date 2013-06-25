@@ -13,6 +13,7 @@ setup(
         'docopt>=0.6.1',
         'hammock==0.2.4',
         'jenkinsapi==0.2.6',
+        'Jinja2==2.7',
     ],
     entry_points={
         'console_scripts': [

@@ -2,6 +2,7 @@
 import os
 from functools import partial
 from fabric.context_managers import cd
+from fabric.contrib.files import upload_template
 
 from fabric.operations import sudo, run
 from fabric.state import env
@@ -11,7 +12,7 @@ from .utils import inside_projects
 
 
 class BaseWriterTask(Task):
-    def get_template_path(self, filename):
+    def get_template_path(self, filename=''):
         return os.path.join('fc_toolbelt/config_templates/', filename)
 
     def get_server_name(self, project, developer):
@@ -61,3 +62,44 @@ class WriteProjectFolders(Task):
         self.run_chmod(project_slug, developer)
 
 write_project = WriteProjectFolders()
+
+
+class WriteUwsgiConfig(BaseWriterTask):
+    """ Write uwsgi config for project+developer"""
+    name = 'write_uwsgi'
+
+    def get_context(self, project_slug, developer):
+        server_name = self.get_server_name(project_slug, developer)
+        project_dir = os.path.join(env.PROJECTS_PATH_TEMPLATE, project_slug)
+        env_dir = os.path.join(project_dir, 'env')
+        return {
+            'GROUP': env.DEVELOPERS_USERGROUP,
+            'RELOAD_TXT': os.path.join(env_dir, 'reload.txt'),
+            'PATH_TO_VIRTUALENV': env_dir,
+            'PROJECT_PATH': os.path.join(project_dir),
+            'SERVER_NAME': server_name,
+            'SOCKET_PATH': self.get_socket_path(server_name),
+            'USER': developer,
+            'PROJECT_NAME': project_slug,
+        }
+
+    def run(self, project_slug, developer):
+        config_name = self.get_server_name(project_slug, developer)
+        config_available_path = '/etc/uwsgi/apps-available/%s.xml' % config_name
+        config_enabled_path = '/etc/uwsgi/apps-enabled-2.7/%s.xml' % config_name
+
+        upload_template(
+            template_dir=self.get_template_path(),
+            filename='uwsgi.config.tmpl',
+            destination=config_available_path,
+            context=self.get_context(project_slug, developer),
+            use_sudo=True,
+            use_jinja=True,
+            backup=False
+        )
+        sudo('ln -s %(available)s %(enabled)s' % {
+            'available': config_available_path,
+            'enabled': config_enabled_path
+        })
+
+write_uwsgi = WriteUwsgiConfig()

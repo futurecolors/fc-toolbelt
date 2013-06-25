@@ -1,0 +1,24 @@
+<uwsgi>
+    <include>../vassal_defaults.ini</include>
+    <socket>{{ SOCKET_PATH }}</socket>
+    <uid>{{ USER }}</uid>
+    <gid>{{ GROUP }}</gid>
+    <virtualenv>{{ PATH_TO_VIRTUALENV }}</virtualenv>
+    <pythonpath>{{ PROJECT_PATH }}</pythonpath>
+    <module>{{ PROJECT_NAME }}.wsgi:application</module>
+    <env>USER={{ USER }}</env>
+    <env>DJANGO_SETTINGS_MODULE={{ PROJECT_NAME }}.live_settings</env>
+    <env>DJANGO_CONFIGURATION={{ USER }}Settings</env>
+    <touch-reload>{{ RELOAD_TXT }}</touch-reload>
+    <logto>/var/log/uwsgi/{{ SERVER_NAME }}.log</logto>
+    <logfile-chown>{{ USER }}</logfile-chown>
+
+    <buffer-size>65536</buffer-size>
+    <harakiri>30</harakiri>
+    <processes>2</processes>
+    <idle>1800</idle>
+    <chmod-socket>777</chmod-socket>
+    <vacuum/>
+    <no-orphans/>
+    <catch-exceptions/>
+</uwsgi>

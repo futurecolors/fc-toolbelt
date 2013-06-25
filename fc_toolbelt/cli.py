@@ -45,7 +45,7 @@ from fc_toolbelt.tasks.gitlab import create_repo, assign
 from fc_toolbelt.tasks.jenkins import create_job
 from fc_toolbelt.tasks.redmine import create_project, assign_permissions
 from fc_toolbelt.tasks.tickets import diff_tickets
-from fc_toolbelt.tasks.writers import write_project
+from fc_toolbelt.tasks.writers import write_project, write_uwsgi
 
 
 logger = logging.getLogger('fc_toolbelt')
@@ -229,9 +229,13 @@ def unbox(argv):
 
        Usage:
           fct unbox write_project <project_slug> <developer>
+          fct unbox write_uwsgi <project_slug> <developer>
     """
     options = docopt(unbox.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
 
     if options['write_project']:
         execute(write_project, project_slug=options['<project_slug>'],
+                               developer=options['<developer>'],)
+    if options['write_uwsgi']:
+        execute(write_uwsgi, project_slug=options['<project_slug>'],
                                developer=options['<developer>'],)
