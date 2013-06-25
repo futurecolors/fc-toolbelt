@@ -41,7 +41,7 @@ class BaseGitlabTask(Task):
         if not GITLAB_TOKEN:
             abort(red('Go to %s/profile/account and grab yourself a token' % self.GITLAB_URL))
 
-        self.api = Hammock(self.GITLAB_URL, params={'private_token': env.GITLAB_TOKEN}).api('v2')
+        self.api = Hammock(self.GITLAB_URL, params={'private_token': env.GITLAB_TOKEN}).api('v3')
         return self
 
 
@@ -49,14 +49,20 @@ class CreateRepo(BaseGitlabTask):
     """ Create new repository via Gitlab """
     name = 'create_repo'
 
-    def run(self, project_slug):
+    def run(self, project_slug, project_name=None):
+        # FIXME: repo is created under namespace (gitlab regression 4.2?)
         super(CreateRepo, self).connect()
-        response = self.api.projects.POST(params={'name': project_slug})
+        response = self.api.projects.POST(params={
+            'name': project_name or project_slug,
+            'code': project_slug,
+            'default_branch': 'dev',
+            'namespace_id': 'GLN'  # Global namespace
+        })
         if response.status_code != requests.codes.created:
-            abort('Project not created %s' % response.content)
-        puts("Created repository %s/%s" % (self.GITLAB_URL, project_slug))
+            abort(red('Project not created %s' % response.content))
+        puts("Created repository %s/%s" % (self.GITLAB_URL, response.json()['path_with_namespace']))
         repo_url = "git@%(host)s:%(path)s.git" % {'host': self.GITLAB_HOST,
-                                                  'path': response.json['path']}
+                                                  'path': response.json()['path']}
         return repo_url
 
 create_repo = CreateRepo()
