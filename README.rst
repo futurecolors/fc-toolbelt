@@ -33,3 +33,12 @@ Commands
 :unbox:      Local deploys
 :update:     Updates code, packages and reloads server
 
+
+Contributing
+------------
+
+Console client is based on `docopt`_ DSL, providing option parsing.
+To add command: put it in readme, add it to ``cli.py`` docstring, create function
+with same name in cli module and specify appropriate docstring for it.
+Module-level docstring serves as fct help, function-level docstrings
+serve as subcommands help.
