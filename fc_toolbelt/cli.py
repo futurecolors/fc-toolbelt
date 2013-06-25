@@ -5,33 +5,49 @@ Starting new Django project should be dead simple.
 A set of useful scripts to setup local development environment.
 
 usage:
-    fct <command> [<args>...] [options]
+    fct <command> [options] [<args>...]
+    fct [--version]
+    fct [--help]
 
 available commands:
     config     Configure toolbelt for first usage
+    update     Updates code, packages and reloads server
+    tickets    Tickets, mentioned in commits between two branches/tags
+    redmine    Create project, assign developers
     help       Prints instruction how to use specific command
     gitlab     Shortcuts to create projects & assign users
     jenkins    Create new jenkins jobs
-    update     Updates code, packages and reloads server
 
 options:
-  -h --help     Show this screen.
-  --version     Show version.
+  -h --help     Show this screen
+  --version     Show version
+  --verbose     Show debug information
+  --from=<from_ref>      Base branch/tag to diff from [default: origin/dev]
+  --to=<to_ref>          Final branch/tag to diff to [default: origin/master]
+  --query_id=<query_id>  Redmine query to filter tickets against
+  --target_id=<target_id>
 
 See 'fct help <command>' for more information on a specific command.
 """
+import logging
 import sys
 import textwrap
 
 from docopt import docopt
 from fabric import state
 from fabric.main import load_settings
+from fabric.state import env
 from fabric.tasks import execute
 
 import fc_toolbelt
 from fc_toolbelt.tasks import django, setup
 from fc_toolbelt.tasks.gitlab import create_repo, assign
 from fc_toolbelt.tasks.jenkins import create_job
+from fc_toolbelt.tasks.redmine import create_project, assign_permissions
+from fc_toolbelt.tasks.tickets import diff_tickets
+
+
+logger = logging.getLogger('fc_toolbelt')
 
 
 def main():
@@ -39,14 +55,20 @@ def main():
     options = docopt(__doc__, argv=sys.argv[1:] if len(sys.argv) > 1 else ['--help'],
                      version=fc_toolbelt.__VERSION__)
 
-    available_commands = ['gitlab', 'jenkins', 'config', 'update']
+    available_commands = ['config', 'gitlab', 'jenkins', 'redmine', 'tickets', 'update']
     command = options['<command>']
 
     # Load fabric defaults from ~/.fabricrc
     state.env.update(load_settings(state._rc_path()))
 
+    if options['--verbose']:
+        level = logging.DEBUG if options['--verbose'] else logging.INFO
+        logger.addHandler(logging.StreamHandler())
+        logger.setLevel(level)
+
     if options['<command>'] in available_commands:
         globals()[command](sys.argv)
+        exit()
     elif options['<command>'] == 'help':
         if not options['<args>']:
             exit(__doc__)
@@ -134,3 +156,67 @@ def config(argv):
     """
     options = docopt(config.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
     execute(setup.config, force=options.get('--force', False))
+
+
+def redmine(argv):
+    """
+       Shortcuts to create projects and assign developers in Redmine.
+
+       Usage:
+          fct redmine create_project <project_slug> [<project_name>]
+          fct redmine assign <project_slug> <user_email>
+    """
+    options = docopt(redmine.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
+    if options['create_project']:
+        execute(create_project,
+                project_slug=options['<project_slug>'],
+                project_name=options.get('<project_name>', None))
+    elif options['assign']:
+        execute(assign_permissions,
+                project_slug=options['<project_slug>'],
+                user_email=options['<user_email>'])
+
+
+def tickets(argv):
+    """
+       List of Redmine tickets urls, mentioned in commits that differ between two branches/tags.
+
+       It's possible to filter specific tickets providing query_id and project_slug.
+       If you specify ticket numbers in your commit messages (it's a best practice),
+       like that:
+
+           Refactored user registration
+           Major speedups, added more tests. Fixes #16
+
+       Redmine will show a link to your commit on ticket page and you can later
+       track what commits are connected to specific task.
+
+       Usage:
+          fct tickets [options] <project_slug>
+
+       Example:
+          fct tickets futurecolors --from=origin/dev --to=origin/master  --query_id=42
+
+       Options:
+          --from=<from_ref>         Base branch/tag to diff from [default: origin/dev]
+          --to=<to_ref>             Final branch/tag to diff to [default: origin/master]
+          --query_id=<query_id>     Redmine query to filter tickets against (doesn't combine with version_id)
+          --target_id=<target_id>  Redmine version id (doesn't combine with query_id)
+          --verbose                 Show debug information
+    """
+
+    options = docopt(tickets.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
+    kwargs = {
+        'project_id': options['<project_slug>'],
+    }
+    mapping = {
+        '--from': 'from_ref',
+        '--to': 'to_ref',
+        '--query_id': 'query_id',
+        '--target_id': 'fixed_version_id'
+    }
+    for arg in mapping.keys():
+        if options.get(arg):
+            kwargs[mapping[arg]] = options.get(arg)
+
+    execute(diff_tickets, **kwargs)
