@@ -14,7 +14,7 @@ from fabric.utils import puts
 class BaseWriterTask(Task):
     def get_template_path(self, template_file=None):
         base_path = join(dirname(dirname(__file__)), 'config_templates/')
-        if file:
+        if template_file:
             return join(base_path, template_file)
         else:
             return base_path
@@ -62,8 +62,7 @@ class WriteProjectFolders(BaseWriterTask):
     def run(self, project_slug, developer, repo_url=None):
         self.user_sudo = user_sudo = partial(sudo, user=developer)
         project_path = self.get_project_path(project_slug, developer)
-        with cd(project_path):
-            user_sudo('mkdir -p %s' % project_slug)
+        user_sudo('mkdir -p %s' % project_path)
         if repo_url:
             self.copy_repo_files_install_env(project_slug, project_path, repo_url)
         mkenv_command = 'mkvirtualenv --python=python2.7 -a %(project_path)s -r %(reqs)s %(env_name)s'
