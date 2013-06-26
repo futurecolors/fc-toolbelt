@@ -73,8 +73,9 @@ def main():
         state.env.output_prefix = False
 
     if options['<command>'] in available_commands:
-        globals()[command](sys.argv)
-        exit()
+        subcommand = globals()[command]
+        options = docopt(subcommand.__doc__, argv=sys.argv[1:])
+        exit(subcommand(options))
     elif options['<command>'] == 'help':
         if not options['<args>']:
             exit(__doc__)
@@ -85,7 +86,7 @@ def main():
     exit("%r is not a fct command. See 'fct --help'." % command)
 
 
-def update(argv):
+def update(options):
     """
        Update code, install packages, sync/migrate and reload.
 
@@ -100,7 +101,7 @@ def update(argv):
     execute(django.update)
 
 
-def gitlab(argv):
+def gitlab(options):
     """
        Shortcuts to create projects & assign users.
 
@@ -113,14 +114,13 @@ def gitlab(argv):
           fct gitlab create_repo <project_slug>
           fct gitlab assign <project_slug> <user_email>
     """
-    options = docopt(gitlab.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
     if options['create_repo']:
         execute(create_repo, project_slug=options['<project_slug>'])
     elif options['assign']:
         execute(assign, project_slug=options['<project_slug>'], user_email=options['<user_email>'])
 
 
-def jenkins(argv):
+def jenkins(options):
     """
        Shortcuts to create jobs in jenkins.
 
@@ -130,7 +130,6 @@ def jenkins(argv):
        Usage:
           fct jenkins create_job <project_slug> <job_name> [<template_job>]
     """
-    options = docopt(jenkins.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
     if options['create_job']:
         execute(create_job,
                 job_name=options['<job_name>'],
@@ -138,7 +137,7 @@ def jenkins(argv):
                 template_job=options['<template_job>'])
 
 
-def config(argv):
+def config(options):
     """
         It will iterate every option in .fabricrc.tmpl prompting you
         to override default values and will write your version of .fabricrc
@@ -160,11 +159,10 @@ def config(argv):
         Options:
             -f --force     Ignore existing setup of toolbelt and reconfigure.
     """
-    options = docopt(config.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
     execute(setup.config, force=options.get('--force', False))
 
 
-def redmine(argv):
+def redmine(options):
     """
        Shortcuts to create projects and assign developers in Redmine.
 
@@ -172,7 +170,6 @@ def redmine(argv):
           fct redmine create_project <project_slug> [<project_name>]
           fct redmine assign <project_slug> <user_email>
     """
-    options = docopt(redmine.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
     if options['create_project']:
         execute(create_project,
                 project_slug=options['<project_slug>'],
@@ -183,7 +180,7 @@ def redmine(argv):
                 user_email=options['<user_email>'])
 
 
-def tickets(argv):
+def tickets(options):
     """
        List of Redmine tickets urls, mentioned in commits that differ between two branches/tags.
 
@@ -210,8 +207,6 @@ def tickets(argv):
           --target_id=<target_id>  Redmine version id (doesn't combine with query_id)
           --verbose                 Show debug information
     """
-
-    options = docopt(tickets.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
     kwargs = {
         'project_id': options['<project_slug>'],
     }
@@ -228,7 +223,7 @@ def tickets(argv):
     execute(diff_tickets, **kwargs)
 
 
-def join(argv):
+def join(options):
     """
        Create dev instance for new project member
 
@@ -239,13 +234,12 @@ def join(argv):
        Usage:
           fct join <project_slug> <developer>
     """
-    options = docopt(join.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
     if options['join']:
         execute(add_developer, project_slug=options['<project_slug>'],
                                developer=options['<developer>'],)
 
 
-def boilerplate(argv):
+def boilerplate(options):
     """
        Start new project from boilerplate
 
@@ -255,7 +249,5 @@ def boilerplate(argv):
        Usage:
           fct boilerplate <project_slug>
     """
-    options = docopt(boilerplate.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
-
     if options['boilerplate']:
         execute(open_tin, project_slug=options['<project_slug>'])
