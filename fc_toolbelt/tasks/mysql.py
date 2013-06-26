@@ -31,7 +31,7 @@ class CreateUser(BaseMysqlTask):
 
     def run(self, user, password):
         if self.user_exists(user):
-            puts('User %s already exists'.format(user))
+            puts('User %s already exists' % user)
             return
         self.execute(self.MYSQL_CREATE_USER % (user, password), 'root')
 

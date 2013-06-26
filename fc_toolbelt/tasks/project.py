@@ -1,6 +1,7 @@
 # coding: utf-8
-from functools import partial
 import os
+from functools import partial
+from fabric.colors import green
 
 from fabric.context_managers import cd, prefix
 from fabric.operations import run, sudo
@@ -68,6 +69,7 @@ class AddDeveloper(BaseGitlabTask):
         self.setup_files(repo_url)
         self.setup_databases()
         self.setup_http()
+        puts(green('Congrats! Now visit: %s' % ('http://%s.%s' % (project_slug, developer))))
 
     def setup_files(self, repo_url):
         sudo_user = partial(sudo, user=self.developer)
@@ -80,7 +82,7 @@ class AddDeveloper(BaseGitlabTask):
 
     def setup_databases(self):
         execute(create_dev_db, self.project_slug, self.developer)
-        puts('Created dev db "%s" for %s' % (self.project_slug, self.developer))
+        puts('Setup of dev db "%s" for %s is finished' % (self.project_slug, self.developer))
 
     def setup_http(self):
         execute(write_uwsgi, self.project_slug, self.developer)

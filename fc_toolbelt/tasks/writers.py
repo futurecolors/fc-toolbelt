@@ -1,8 +1,8 @@
 # coding: utf-8
 import os
-from functools import partial
 import socket
-from fabric.context_managers import cd
+from functools import partial
+from fabric.context_managers import cd, settings, show
 from fabric.contrib.files import upload_template
 
 from fabric.operations import sudo, run
@@ -49,7 +49,8 @@ class WriteProjectFolders(BaseWriterTask):
         """ workaround not having permissions in target dir to clone directly"""
         tmp_dir = '/tmp/fctools/%s' % project_slug
         sudo('rm -rf %s' % tmp_dir)
-        run('git clone %s %s -b dev' % (repo_url, tmp_dir))  # dev branch is default
+        with settings(show('commands'), warn_only=True):  # so that you can enter credentials
+            run('git clone %s %s -b dev' % (repo_url, tmp_dir))  # dev branch is default
         sudo('rm -rf %s/.git' % tmp_dir)
         sudo('cp -R %s/* %s' % (tmp_dir, project_path))
         sudo('rm -rf %s' % tmp_dir)
@@ -67,7 +68,7 @@ class WriteProjectFolders(BaseWriterTask):
                                    'env_name': project_slug})
         with cd(env.ENVS_PATH_TEMPLATE % {'user': developer}):
             user_sudo('touch %s/reload.txt' % project_slug)
-        with cd(project_path):
+        with cd(env.PROJECTS_PATH_TEMPLATE % ({'user': developer})):
             self.run_chmod(project_slug, developer)
 
 write_project = WriteProjectFolders()

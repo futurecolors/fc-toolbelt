@@ -66,6 +66,9 @@ def main():
         level = logging.DEBUG if options['--verbose'] else logging.INFO
         logger.addHandler(logging.StreamHandler())
         logger.setLevel(level)
+    else:
+        state.output['commands'] = False
+        state.env.output_prefix = False
 
     if options['<command>'] in available_commands:
         globals()[command](sys.argv)

@@ -13,7 +13,10 @@ Installation
     pip install -e git+https://github.com/futurecolors/fc-toolbelt#egg=fc_toolbelt
     fct config
 
-Make sure you have sufficient permissions on remote server.
+Make sure you have sufficient permissions:
+
+    * sudo access is required
+    * mysql access is required
 
 Usage
 -----
