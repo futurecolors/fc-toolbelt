@@ -3,6 +3,7 @@ Changelog
 
 0.1.1 (26.06.2013)
 ------------------
+- Split ``unbox`` subcommand into ``join`` and ``boilerplate``.
 - Less verbose output
 
 

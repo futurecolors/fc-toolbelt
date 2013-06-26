@@ -4,8 +4,6 @@ Future Colors Toolbelt
 Starting new Django project should be dead simple.
 A set of useful scripts to setup local development environment.
 
-**Work in progress, beware!**
-
 Installation
 ------------
 ::
@@ -29,14 +27,15 @@ Usage
 Commands
 ^^^^^^^^
 
-:config:     Configure toolbelt for first usage
-:gitlab:     Shortcuts to create repos & assign users
-:help:       Usage instructions
-:jenkins:    Create new jenkins jobs
-:redmine:    Create project, assign developers
-:tickets:    Tickets, mentioned in commits between two branches/tags
-:unbox:      Local deploys
-:update:     Updates code, packages and reloads server
+:boilerplate:   Start new project from boilerplate
+:config:        Configure toolbelt for first usage
+:gitlab:        Shortcuts to create repos & assign users
+:help:          Usage instructions
+:jenkins:       Create new jenkins jobs
+:join:          Create dev instance for new project member
+:redmine:       Create redmine project, assign developers
+:tickets:       Tickets, mentioned in commits between two branches/tags
+:update:        Updates code, packages and reloads server
 
 
 Contributing

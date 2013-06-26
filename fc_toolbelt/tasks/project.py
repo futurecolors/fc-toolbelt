@@ -14,16 +14,17 @@ from fc_toolbelt.tasks.mysql import create_dev_db
 from .writers import write_uwsgi, write_nginx, write_project
 
 
-class OpenTin(Task):
+class OpenTin(BaseGitlabTask):
     """ Commit new Django project from template into repo"""
 
-    def run(self, project_slug, repo_url):
+    def run(self, project_slug):
         self.project_slug = project_slug
         tmpdir = '/tmp/fctools/'
         run('rm -rf /tmp/fctools/')
         run('mkdir -p %s' % tmpdir)
 
         self.create_folders_from_can(tmpdir)
+        repo_url = self.get_repo_url_by_path(project_slug)
         self.make_initial_commit(os.path.join(tmpdir, self.project_slug), repo_url)
         run('rm -rf /tmp/fctools/')
 

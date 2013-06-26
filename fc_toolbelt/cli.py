@@ -10,14 +10,15 @@ usage:
     fct [--help]
 
 available commands:
-    config     Configure toolbelt for first usage
-    gitlab     Shortcuts to create projects & assign users
-    help       Prints instruction how to use specific command
-    jenkins    Create new jenkins jobs
-    redmine    Create project, assign developers
-    tickets    Tickets, mentioned in commits between two branches/tags
-    unbox      Local deploys
-    update     Updates code, packages and reloads server
+    boilerplate  Start new project from boilerplate
+    config       Configure toolbelt for first usage
+    gitlab       Shortcuts to create projects & assign users
+    help         Prints instruction how to use specific command
+    jenkins      Create new jenkins jobs
+    join         Create dev instance for new project member
+    redmine      Create project, assign developers
+    tickets      Tickets, mentioned in commits between two branches/tags
+    update       Updates code, packages and reloads server
 
 options:
   -h --help     Show this screen
@@ -56,7 +57,8 @@ def main():
     options = docopt(__doc__, argv=sys.argv[1:] if len(sys.argv) > 1 else ['--help'],
                      version=fc_toolbelt.__VERSION__)
 
-    available_commands = ['config', 'gitlab', 'jenkins', 'redmine', 'tickets', 'unbox', 'update']
+    available_commands = ['boilerplate', 'config', 'gitlab', 'jenkins', 'join',
+                          'redmine', 'tickets', 'update']
     command = options['<command>']
 
     # Load fabric defaults from ~/.fabricrc
@@ -226,19 +228,34 @@ def tickets(argv):
     execute(diff_tickets, **kwargs)
 
 
-def unbox(argv):
+def join(argv):
     """
-       Local deploys
+       Create dev instance for new project member
+
+       * deploys code from gitlab repo on dev server
+       * configures webserver for local development (ngnix+uwsgi)
+       * sets up database <project>_<developer>
 
        Usage:
-          fct unbox add_developer <project_slug> <developer>
-          fct unbox open_tin <project_slug> <repo_url>
+          fct join <project_slug> <developer>
     """
-    options = docopt(unbox.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
-
-    if options['open_tin']:
-        execute(open_tin, project_slug=options['<project_slug>'],
-                          repo_url=options['<repo_url>'],)
-    if options['add_developer']:
+    options = docopt(join.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
+    if options['join']:
         execute(add_developer, project_slug=options['<project_slug>'],
                                developer=options['<developer>'],)
+
+
+def boilerplate(argv):
+    """
+       Start new project from boilerplate
+
+       * creates new django project from template
+       * pushes the code into gitlab repo
+
+       Usage:
+          fct boilerplate <project_slug>
+    """
+    options = docopt(boilerplate.__doc__, argv=argv[1:] if len(argv) > 1 else ['--help'])
+
+    if options['boilerplate']:
+        execute(open_tin, project_slug=options['<project_slug>'])
