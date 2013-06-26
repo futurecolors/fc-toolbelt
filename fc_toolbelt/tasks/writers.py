@@ -1,5 +1,5 @@
 # coding: utf-8
-import os
+from os.path import join, dirname
 import socket
 from functools import partial
 from fabric.context_managers import cd, settings, show
@@ -13,9 +13,9 @@ from fabric.utils import puts
 
 class BaseWriterTask(Task):
     def get_template_path(self, template_file=None):
-        base_path = 'fc_toolbelt/config_templates/'
+        base_path = join(dirname(dirname(__file__)), 'config_templates/')
         if file:
-            return os.path.join(base_path, template_file)
+            return join(base_path, template_file)
         else:
             return base_path
 
@@ -26,10 +26,10 @@ class BaseWriterTask(Task):
         return '/var/run/uwsgi/%s.sock' % server_name
 
     def get_project_path(self, project, developer):
-        return os.path.join(env.PROJECTS_PATH_TEMPLATE % ({'user': developer}), project)
+        return join(env.PROJECTS_PATH_TEMPLATE % ({'user': developer}), project)
 
     def get_env_path(self, project, developer):
-        return os.path.join(env.ENVS_PATH_TEMPLATE % ({'user': developer}), project)
+        return join(env.ENVS_PATH_TEMPLATE % ({'user': developer}), project)
 
 
 class WriteProjectFolders(BaseWriterTask):
