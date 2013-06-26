@@ -5,7 +5,7 @@ Changelog
 ------------------
 - Split ``unbox`` subcommand into ``join`` and ``boilerplate``.
 - Less verbose output
-
+- Simplified uwsgi config (vassal_defaults)
 
 0.1 (25.06.2013)
 ----------------

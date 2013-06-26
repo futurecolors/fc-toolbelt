@@ -83,20 +83,17 @@ class WriteUwsgiConfig(BaseWriterTask):
         project_dir = self.get_project_path(project_slug, developer)
         env_dir = self.get_env_path(project_slug, developer)
         return {
-            'GROUP': env.DEVELOPERS_USERGROUP,
-            'RELOAD_TXT': os.path.join(env_dir, 'reload.txt'),
             'PATH_TO_VIRTUALENV': env_dir,
             'PROJECT_PATH': project_dir,
             'SERVER_NAME': server_name,
-            'SOCKET_PATH': self.get_socket_path(server_name),
             'USER': developer,
             'PROJECT_NAME': project_slug,
         }
 
     def run(self, project_slug, developer):
         config_name = self.get_server_name(project_slug, developer)
-        config_available_path = '/etc/uwsgi/apps-available/%s.xml' % config_name
-        config_enabled_path = '/etc/uwsgi/apps-enabled-2.7/%s.xml' % config_name
+        config_available_path = '/etc/uwsgi/apps-available/%s.ini' % config_name
+        config_enabled_path = '/etc/uwsgi/apps-enabled-2.7/%s.ini' % config_name
 
         upload_template(
             template_dir=self.get_template_path(),
