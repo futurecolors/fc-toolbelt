@@ -14,7 +14,8 @@ Installation
 Make sure you have sufficient permissions:
 
     * sudo access is required
-    * mysql access is required
+    * mysql access is required (.my.cnf)
+    * all api tokens got to have sufficient permissions
 
 Usage
 -----
@@ -48,3 +49,6 @@ with same name in cli module and specify appropriate docstring for it.
 
 Module-level docstring serves as fct help, function-level docstrings
 serve as subcommands help and parser spec.
+
+
+.. _docopt: http://docopt.org/
