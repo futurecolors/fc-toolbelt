@@ -24,6 +24,7 @@ options:
   -h --help     Show this screen
   --version     Show version
   --verbose     Show debug information
+  --force       Force
   --from=<from_ref>      Base branch/tag to diff from [default: origin/dev]
   --to=<to_ref>          Final branch/tag to diff to [default: origin/master]
   --query_id=<query_id>  Redmine query to filter tickets against
@@ -154,7 +155,7 @@ def config(options):
             KEY2 = another_value
 
         Usage:
-            fct config
+            fct config [options]
 
         Options:
             -f --force     Ignore existing setup of toolbelt and reconfigure.

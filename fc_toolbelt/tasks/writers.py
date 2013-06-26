@@ -12,8 +12,12 @@ from fabric.utils import puts
 
 
 class BaseWriterTask(Task):
-    def get_template_path(self):
-        return 'fc_toolbelt/config_templates/'
+    def get_template_path(self, template_file=None):
+        base_path = 'fc_toolbelt/config_templates/'
+        if file:
+            return os.path.join(base_path, template_file)
+        else:
+            return base_path
 
     def get_server_name(self, project, developer):
         return '%s.%s' % (project, developer)
