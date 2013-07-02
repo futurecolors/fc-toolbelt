@@ -126,6 +126,7 @@ class WriteNginxConfig(BaseWriterTask):
             'SERVER_IP': socket.gethostbyname(env.hosts),
             'SOCKET_PATH': self.get_socket_path(server_name),
             'PROJECT_PATH': self.get_project_path(project_slug, developer),
+            'PROJECT_NAME': project_slug,
         }
 
     def run(self, project_slug, developer, noreload=False):

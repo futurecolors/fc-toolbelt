@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.1.2 (02.07.2013)
+------------------
+- Nginx config template fixed for media
+
 0.1.1 (26.06.2013)
 ------------------
 - Split ``unbox`` subcommand into ``join`` and ``boilerplate``.

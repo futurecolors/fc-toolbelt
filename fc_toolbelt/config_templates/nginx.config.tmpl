@@ -20,20 +20,20 @@ server {
     }
 
     location /media {
-        root {{ PROJECT_PATH }};
+        root {{ PROJECT_PATH }}/{{ PROJECT_NAME }};
         autoindex off;
     }
 
     location /robots.txt {
-        root {{ PROJECT_PATH }}/static/;
+        root {{ PROJECT_PATH }}/{{ PROJECT_NAME }}/static/;
         expires -1;
     }
     location /humans.txt {
-        root {{ PROJECT_PATH }}/static/;
+        root {{ PROJECT_PATH }}/{{ PROJECT_NAME }}/static/;
         expires -1;
     }
     location /favicon.ico {
-        root {{ PROJECT_PATH }}/static/;
+        root {{ PROJECT_PATH }}/{{ PROJECT_NAME }}/static/;
         expires 1M;
     }
 }
