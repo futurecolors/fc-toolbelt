@@ -233,7 +233,10 @@ def join(options):
        * sets up database <project>_<developer>
 
        Usage:
-          fct join <project_slug> <developer>
+          fct join [options] <project_slug> <developer>
+
+        Options:
+          --verbose                 Show debug information
     """
     if options['join']:
         execute(add_developer, project_slug=options['<project_slug>'],
