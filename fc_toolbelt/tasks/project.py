@@ -62,7 +62,7 @@ class AddDeveloper(BaseGitlabTask):
     """ Creates development project environment for developer"""
     name = 'add_developer'
 
-    def run(self, project_slug, developer):
+    def run(self, project_slug, developer, uwsgi_config=None):
         self.project_slug = project_slug
         self.developer = developer
         self.connect()

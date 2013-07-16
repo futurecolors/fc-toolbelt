@@ -1,0 +1,12 @@
+[uwsgi]
+include = ../vassal_defaults.ini
+project_name = {{ PROJECT_NAME }}
+user = {{ USER }}
+server_name = {{ SERVER_NAME }}
+project_home = {{ PROJECT_PATH }}
+env_home = {{ PATH_TO_VIRTUALENV }}
+
+module = django.core.handlers.wsgi:WSGIHandler()
+env = DJANGO_SETTINGS_MODULE=settings
+env = DJANGO_SETTINGS_ENVIRONMENT=development
+env = USER={{ USER }}

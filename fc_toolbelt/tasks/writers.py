@@ -100,7 +100,7 @@ class WriteUwsgiConfig(BaseWriterTask):
 
         upload_template(
             template_dir=self.get_template_path(),
-            filename='uwsgi.config.tmpl',
+            filename=env.get('UWSGI_CONFIG_TEMPLATE', 'uwsgi.config.tmpl'),
             destination=config_available_path,
             context=self.get_context(project_slug, developer),
             use_sudo=True,
