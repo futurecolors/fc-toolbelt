@@ -26,6 +26,7 @@ options:
   --verbose     Show debug information
   --force       Force
   --uwsgi-config=<config>
+  --python=<version>
   --from=<from_ref>      Base branch/tag to diff from [default: origin/dev]
   --to=<to_ref>          Final branch/tag to diff to [default: origin/master]
   --query_id=<query_id>  Redmine query to filter tickets against
@@ -239,10 +240,13 @@ def join(options):
        Options:
           --verbose                  Show debug information
           --uwsgi-config=<config>    Change default uwsgi template
+          --python=<version>         Change default python version
     """
     if options['join']:
         if options.get('--uwsgi-config'):
             state.env.UWSGI_CONFIG_TEMPLATE = options.get('--uwsgi-config')
+        if options.get('--python'):
+            state.env.PYTHON_VERSION = options.get('--python')
         execute(add_developer, project_slug=options['<project_slug>'],
                                developer=options['<developer>'])
 

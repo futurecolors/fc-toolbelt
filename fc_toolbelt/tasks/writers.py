@@ -65,8 +65,9 @@ class WriteProjectFolders(BaseWriterTask):
         user_sudo('mkdir -p %s' % project_path)
         if repo_url:
             self.copy_repo_files_install_env(project_slug, project_path, repo_url)
-        mkenv_command = 'mkvirtualenv --python=python2.7 -a %(project_path)s -r %(reqs)s %(env_name)s'
-        user_sudo(mkenv_command % {'project_path': self.get_project_path(project_slug, developer),
+        mkenv_command = 'mkvirtualenv --python=python%(version)s -a %(project_path)s -r %(reqs)s %(env_name)s'
+        user_sudo(mkenv_command % {'version': env.get('PYTHON_VERSION', '2.7'),
+                                   'project_path': self.get_project_path(project_slug, developer),
                                    'reqs': 'requirements.txt',
                                    'env_name': project_slug})
         with cd(env.ENVS_PATH_TEMPLATE % {'user': developer}):
@@ -96,7 +97,7 @@ class WriteUwsgiConfig(BaseWriterTask):
     def run(self, project_slug, developer):
         config_name = self.get_server_name(project_slug, developer)
         config_available_path = '/etc/uwsgi/apps-available/%s.ini' % config_name
-        config_enabled_path = '/etc/uwsgi/apps-enabled-2.7/%s.ini' % config_name
+        config_enabled_path = '/etc/uwsgi/apps-enabled-%s/%s.ini' % (env.get('PYTHON_VERSION', '2.7'), config_name)
 
         upload_template(
             template_dir=self.get_template_path(),
