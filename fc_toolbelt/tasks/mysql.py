@@ -19,7 +19,7 @@ class CreateDevDb(Task):
         execute(CreateUser(), project, password)
         db_name = '%s_%s' % (project, user)
         execute(CreateDb(), db_name)
-        execute(GrantPermissions(), db_name, user)
+        execute(GrantPermissions(), db_name, project)
 
 create_dev_db = CreateDevDb()
 
