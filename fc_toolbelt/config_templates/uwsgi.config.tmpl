@@ -7,6 +7,6 @@ project_home = {{ PROJECT_PATH }}
 env_home = {{ PATH_TO_VIRTUALENV }}
 
 module = {{ PROJECT_NAME }}.wsgi:application
-env = DJANGO_SETTINGS_MODULE={{ PROJECT_NAME }}.live_settings
-env = DJANGO_CONFIGURATION={{ USER }}Settings
+env = DJANGO_SETTINGS_MODULE={{ PROJECT_NAME }}.settings
+env = DJANGO_CONFIGURATION={{ USER|title }}
 env = USER={{ USER }}
