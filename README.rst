@@ -30,6 +30,7 @@ Commands
 
 :boilerplate:   Start new project from boilerplate
 :config:        Configure toolbelt for first usage
+:git:           Useful git aliases, read more in fct help git
 :gitlab:        Shortcuts to create repos & assign users
 :help:          Usage instructions
 :jenkins:       Create new jenkins jobs

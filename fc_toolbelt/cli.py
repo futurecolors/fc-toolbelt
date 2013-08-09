@@ -12,6 +12,7 @@ usage:
 available commands:
     boilerplate  Start new project from boilerplate
     config       Configure toolbelt for first usage
+    git          Useful git aliases, read more in fct help git
     gitlab       Shortcuts to create projects & assign users
     help         Prints instruction how to use specific command
     jenkins      Create new jenkins jobs
@@ -45,6 +46,7 @@ from fabric.tasks import execute
 
 import fc_toolbelt
 from fc_toolbelt.tasks import django, setup
+from fc_toolbelt.tasks.git import prune
 from fc_toolbelt.tasks.gitlab import create_repo, assign
 from fc_toolbelt.tasks.jenkins import create_job
 from fc_toolbelt.tasks.project import open_tin, add_developer
@@ -60,14 +62,14 @@ def main():
     options = docopt(__doc__, argv=sys.argv[1:] if len(sys.argv) > 1 else ['--help'],
                      version=fc_toolbelt.__VERSION__)
 
-    available_commands = ['boilerplate', 'config', 'gitlab', 'jenkins', 'join',
+    available_commands = ['boilerplate', 'config', 'git', 'gitlab', 'jenkins', 'join',
                           'redmine', 'tickets', 'update']
     command = options['<command>']
 
     # Load fabric defaults from ~/.fabricrc
     state.env.update(load_settings(state._rc_path()))
 
-    if options['--verbose']:
+    if True or options['--verbose']:
         level = logging.DEBUG if options['--verbose'] else logging.INFO
         logger.addHandler(logging.StreamHandler())
         logger.setLevel(level)
@@ -102,6 +104,19 @@ def update(options):
        * reload uwsgi instance
     """
     execute(django.update)
+
+
+def git(options):
+    """
+       No need to make own aliases for git commands.
+
+       * Remove old branches from origin
+
+       Usage:
+          fct git prune
+    """
+    if options['prune']:
+        execute(prune)
 
 
 def gitlab(options):

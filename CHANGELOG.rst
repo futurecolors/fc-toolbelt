@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2 (09.08.2013)
+------------------
+- Added ``fct git prune`` alias
+
+
 0.1.3 (16.07.2013)
 ------------------
 - Custom uwsgi config ``UWSGI_CONFIG_TEMPLATE``
