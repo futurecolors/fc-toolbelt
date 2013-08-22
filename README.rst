@@ -22,13 +22,15 @@ Usage
 ::
 
     fct COMMAND [command-specific-options]
-    fct help COMMAND
 
 
 Commands
 ^^^^^^^^
 
-:boilerplate:   Start new project from boilerplate
+Use ``fct help COMMAND`` to see what options are available
+
+
+:boilerplate:   Start new project from boilerplate, e.g. `tinned-django`_
 :config:        Configure toolbelt for first usage
 :git:           Useful git aliases, read more in fct help git
 :gitlab:        Shortcuts to create repos & assign users
@@ -53,3 +55,4 @@ serve as subcommands help and parser spec.
 
 
 .. _docopt: http://docopt.org/
+.. _tinned-django: https://github.com/futurecolors/tinned-django
