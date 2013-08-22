@@ -24,6 +24,7 @@ class OpenTin(BaseGitlabTask):
         run('mkdir -p %s' % tmpdir)
 
         self.create_folders_from_can(tmpdir)
+        self.connect()
         repo_url = self.get_repo_url_by_path(project_slug)
         self.make_initial_commit(os.path.join(tmpdir, self.project_slug), repo_url)
         run('rm -rf /tmp/fctools/')
