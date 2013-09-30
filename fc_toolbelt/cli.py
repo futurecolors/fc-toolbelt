@@ -32,6 +32,7 @@ options:
   --to=<to_ref>          Final branch/tag to diff to [default: origin/master]
   --query_id=<query_id>  Redmine query to filter tickets against
   --target_id=<target_id>
+  --urls
 
 See 'fct help <command>' for more information on a specific command.
 """
@@ -222,7 +223,8 @@ def tickets(options):
           --from=<from_ref>         Base branch/tag to diff from [default: origin/dev]
           --to=<to_ref>             Final branch/tag to diff to [default: origin/master]
           --query_id=<query_id>     Redmine query to filter tickets against (doesn't combine with version_id)
-          --target_id=<target_id>  Redmine version id (doesn't combine with query_id)
+          --target_id=<target_id>   Redmine version id (doesn't combine with query_id)
+          --urls                    Show just urls of tickets
           --verbose                 Show debug information
     """
     kwargs = {
@@ -232,7 +234,8 @@ def tickets(options):
         '--from': 'from_ref',
         '--to': 'to_ref',
         '--query_id': 'query_id',
-        '--target_id': 'fixed_version_id'
+        '--target_id': 'fixed_version_id',
+        '--urls': 'urls'
     }
     for arg in mapping.keys():
         if options.get(arg):

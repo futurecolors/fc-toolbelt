@@ -108,3 +108,6 @@ class GetIssues(BaseRedmineTask):
         params.update(kwargs)
         resp = self.api('issues.json').GET(params=params)
         return resp.json()['issues'], resp.json()['total_count']
+
+    def get_issue_title(self, issue_id):
+        return self.api.issues('%s.json' % issue_id).GET().json()['issue']['subject']

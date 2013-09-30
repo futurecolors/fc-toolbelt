@@ -21,13 +21,18 @@ class DiffTickets(GetIssues):
         self.connect()
         puts('Querying Redmine...')
         issues = self.get_issues(**kwargs)
-        ticket_ids = self.git_ticket_ids(from_ref, to_ref)
+        ticket_ids = filter(None, self.git_ticket_ids(from_ref, to_ref))
         logger.debug('%s: %s' % ('Redmine', [issue['id'] for issue in issues]))
         logger.debug('%s: %s' % ('Git', ticket_ids))
         get_issue_url = lambda issue_id: env.REDMINE_URL + '/issues/%s' % issue_id
-        issues_urls = [get_issue_url(issue['id']) for issue in issues
-                       if str(issue['id']) in ticket_ids]
-        map(puts, issues_urls)
+        if kwargs.get('urls'):
+            issues_urls = [get_issue_url(issue['id']) for issue in issues
+                           if str(issue['id']) in ticket_ids]
+            map(puts, issues_urls)
+        else:
+            human_friendly = [u'#%s %s' % (ticket_id, self.get_issue_title(ticket_id)) for ticket_id in ticket_ids]
+            for row in human_friendly:
+                print(row)
 
     def git_ticket_ids(self, from_ref, to_ref):
         """ List of ids"""
