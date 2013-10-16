@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import print_function
 import logging
 from fabric.operations import local
 
@@ -6,6 +7,7 @@ from fabric.state import env
 from fabric.utils import puts
 
 from fc_toolbelt.tasks.redmine import GetIssues
+
 
 
 logger = logging.getLogger('fc_toolbelt')
@@ -26,13 +28,12 @@ class DiffTickets(GetIssues):
         logger.debug('%s: %s' % ('Git', ticket_ids))
         get_issue_url = lambda issue_id: env.REDMINE_URL + '/issues/%s' % issue_id
         if kwargs.get('urls'):
-            issues_urls = [get_issue_url(issue['id']) for issue in issues
-                           if str(issue['id']) in ticket_ids]
-            map(puts, issues_urls)
+            formatter = lambda issue: get_issue_url(issue['id'])
         else:
-            human_friendly = [u'#%s %s' % (ticket_id, self.get_issue_title(ticket_id)) for ticket_id in ticket_ids]
-            for row in human_friendly:
-                print(row)
+            formatter = lambda issue: u'#%s %s' % (issue['id'], self.get_issue_title(issue['id']))
+
+        issues_urls = [formatter(issue) for issue in issues if str(issue['id']) in ticket_ids]
+        map(print, issues_urls)
 
     def git_ticket_ids(self, from_ref, to_ref):
         """ List of ids"""
