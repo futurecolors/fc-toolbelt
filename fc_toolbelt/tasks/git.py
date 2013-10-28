@@ -28,8 +28,8 @@ class GetBranch(Task):
 
     name = 'get_git_branch'
     get_branch_commnad = (
-        """git for-each-ref --sort=committerdate --format="%(refname:short)" """
-        """| grep "{0}" | tail -n 1"""
+        """git for-each-ref --sort='-committerdate' --format='%(refname:short)' """
+        """| grep '{0}' | head -n 1"""
     )
 
     def run(self, git_branch, **kwargs):

@@ -222,6 +222,10 @@ def tickets(options):
        Example:
           fct tickets futurecolors --from=origin/dev --to=origin/master --query_id=42
 
+          fct tickets fut --from='origin/master' --to='^production$' --full --by_ids
+
+          fct tickets fut --from='^origin/release/*' --to='origin/master' --full --by_ids
+
        Options:
           --from=<from_ref>         Base branch/tag to diff from [default: origin/dev]
           --to=<to_ref>             Final branch/tag to diff to [default: origin/master]
