@@ -9,7 +9,6 @@ from fabric.utils import puts
 from fc_toolbelt.tasks.redmine import GetIssues
 
 
-
 logger = logging.getLogger('fc_toolbelt')
 
 
@@ -20,17 +19,33 @@ class DiffTickets(GetIssues):
     GIT_CALL = """git log {from_ref} --not {to_ref} --format="%s" --no-merges | grep -E "#\d+" -o | uniq  | cut -c2- """
 
     def run(self, from_ref='origin/dev', to_ref='origin/master', **kwargs):
+
+        ticket_ids = filter(None, self.git_ticket_ids(from_ref, to_ref))
+
         self.connect()
         puts('Querying Redmine...')
-        issues = self.get_issues(**kwargs)
-        ticket_ids = filter(None, self.git_ticket_ids(from_ref, to_ref))
+        if kwargs.get('by_ids'):
+            issues = self.get_issues_by_ids(ticket_ids)
+        else:
+            issues = self.get_issues(**kwargs)
+
         logger.debug('%s: %s' % ('Redmine', [issue['id'] for issue in issues]))
         logger.debug('%s: %s' % ('Git', ticket_ids))
+
         get_issue_url = lambda issue_id: env.REDMINE_URL + '/issues/%s' % issue_id
         if kwargs.get('urls'):
             formatter = lambda issue: get_issue_url(issue['id'])
+        elif kwargs.get('status'):
+            formatter = lambda issue: u'#%s %s' % (issue['id'], issue['status']['name'])
+        elif kwargs.get('full'):
+            formatter = lambda issue: u'#{id} {status} {link} {subject}'.format(
+                id=issue['id'],
+                link=get_issue_url(issue['id']),
+                status=issue['status']['name'],
+                subject=issue['subject'],
+            )
         else:
-            formatter = lambda issue: u'#%s %s' % (issue['id'], self.get_issue_title(issue['id']))
+            formatter = lambda issue: u'#%s %s' % (issue['id'], issue['subject'])
 
         issues_urls = [formatter(issue) for issue in issues if str(issue['id']) in ticket_ids]
         map(print, issues_urls)

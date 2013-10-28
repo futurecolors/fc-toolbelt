@@ -22,17 +22,20 @@ available commands:
     update       Updates code, packages and reloads server
 
 options:
-  -h --help     Show this screen
-  --version     Show version
-  --verbose     Show debug information
-  --force       Force
+  -h --help                 Show this screen
+  --version                 Show version
+  --verbose                 Show debug information
+  --force                   Force
   --uwsgi-config=<config>
   --python=<version>
-  --from=<from_ref>      Base branch/tag to diff from [default: origin/dev]
-  --to=<to_ref>          Final branch/tag to diff to [default: origin/master]
-  --query_id=<query_id>  Redmine query to filter tickets against
-  --target_id=<target_id>
-  --urls
+  --from=<from_ref>         ## tickets command ##
+  --to=<to_ref>             ## tickets command ##
+  --query_id=<query_id>     ## tickets command ##
+  --status                  ## tickets command ##
+  --full                    ## tickets command ##
+  --target_id=<target_id>   ## tickets command ##
+  --urls                    ## tickets command ##
+  --by_ids                  ## tickets command ##
 
 See 'fct help <command>' for more information on a specific command.
 """
@@ -217,7 +220,7 @@ def tickets(options):
           fct tickets [options] <project_slug>
 
        Example:
-          fct tickets futurecolors --from=origin/dev --to=origin/master  --query_id=42
+          fct tickets futurecolors --from=origin/dev --to=origin/master --query_id=42
 
        Options:
           --from=<from_ref>         Base branch/tag to diff from [default: origin/dev]
@@ -226,6 +229,9 @@ def tickets(options):
           --target_id=<target_id>   Redmine version id (doesn't combine with query_id)
           --urls                    Show just urls of tickets
           --verbose                 Show debug information
+          --status                  Issue status from Redmine query results
+          --full                    Full info from Redmine query results
+          --by_ids                  Get results from Redmine by ticket ids list
     """
     kwargs = {
         'project_id': options['<project_slug>'],
@@ -235,7 +241,10 @@ def tickets(options):
         '--to': 'to_ref',
         '--query_id': 'query_id',
         '--target_id': 'fixed_version_id',
-        '--urls': 'urls'
+        '--urls': 'urls',
+        '--status': 'status',
+        '--full': 'full',
+        '--by_ids': 'by_ids',
     }
     for arg in mapping.keys():
         if options.get(arg):

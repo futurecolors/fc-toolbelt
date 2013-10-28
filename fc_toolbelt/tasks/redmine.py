@@ -103,11 +103,17 @@ class GetIssues(BaseRedmineTask):
             issues += new_issues
         return issues
 
+    def get_issues_by_ids(self, issue_ids):
+        return [self.get_issue_by_id(issue_id)['issue'] for issue_id in issue_ids]
+
     def get_issues_page(self, offset=0, limit=100, **kwargs):
         params = {'limit': limit, 'offset': offset}
         params.update(kwargs)
         resp = self.api('issues.json').GET(params=params)
         return resp.json()['issues'], resp.json()['total_count']
 
+    def get_issue_by_id(self, issue_id):
+        return self.api.issues('%s.json' % issue_id).GET().json()
+
     def get_issue_title(self, issue_id):
-        return self.api.issues('%s.json' % issue_id).GET().json()['issue']['subject']
+        return self.get_issue_by_id(issue_id)['subject']
