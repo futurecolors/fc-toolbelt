@@ -23,4 +23,28 @@ class DeleteMergedBranches(Task):
             print result
 
 
+class GetBranch(Task):
+    """Get branch by mask"""
+
+    name = 'get_git_branch'
+    get_branch_commnad = (
+        """git for-each-ref --sort=committerdate --format="%(refname:short)" """
+        """| grep "{0}" | tail -n 1"""
+    )
+
+    def run(self, git_branch, **kwargs):
+        result = local(self.get_branch_commnad.format(git_branch), capture=True)
+
+        branch_name = result.strip()
+
+        if not branch_name:
+            raise AttributeError(
+                "Bad git branch mask: \n"
+                "%s" % result
+            )
+
+        return branch_name
+
+
+get_branch = GetBranch()
 prune = DeleteMergedBranches()

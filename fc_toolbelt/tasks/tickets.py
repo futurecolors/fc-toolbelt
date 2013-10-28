@@ -5,6 +5,7 @@ from fabric.operations import local
 
 from fabric.state import env
 from fabric.utils import puts
+from fc_toolbelt.tasks.git import get_branch
 
 from fc_toolbelt.tasks.redmine import GetIssues
 
@@ -52,6 +53,8 @@ class DiffTickets(GetIssues):
 
     def git_ticket_ids(self, from_ref, to_ref):
         """ List of ids"""
+        from_ref = get_branch.run(from_ref)
+        to_ref = get_branch.run(to_ref)
         git_log_output = local(self.GIT_CALL.format(from_ref=from_ref, to_ref=to_ref), capture=True)
         return git_log_output.split('\n')
 
