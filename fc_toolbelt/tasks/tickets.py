@@ -17,11 +17,11 @@ class DiffTickets(GetIssues):
     """ List of Redmine tickets urls, mentioned in commits that differ between two branches/tags.
     """
     name = 'tickets'
-    GIT_CALL = """git log {from_ref} --not {to_ref} --format="%s" --no-merges | grep -E "#\d+" -o | uniq  | cut -c2- """
+    GIT_CALL = """git log {from_ref} --not {to_ref} --format="%s" --no-merges | grep -E "#\d+" -o | cut -c2- """
 
     def run(self, from_ref='origin/dev', to_ref='origin/master', **kwargs):
 
-        ticket_ids = filter(None, self.git_ticket_ids(from_ref, to_ref))
+        ticket_ids = set(filter(None, self.git_ticket_ids(from_ref, to_ref)))
 
         self.connect()
         puts('Querying Redmine...')
